@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+
+#MONGO_DB
+  mongodb:
+    image: mongo
+    container_name: mangoose-mongo-storage
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mtg2410
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodbdata:/data/db
+
+  quarkus-app:
+    image: quarkus/mangoose-jvm:1.0.0
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+      - QUARKUS_MONGODB_CONNECTION_STRING=mongodb://root:mtg2410@mongodb:27017/  # adjust connection string and database name
+
+#  mangoose-app:
+#    image: quarkus
+#    container_name: mangoose-app
+#    depends_on:
+#      - mongodb
+#    volumes:
+#      - ./mangoose:/usr/src/app
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - MAVEN_OPTS=-Duser.home=/workspace
+#    command: mvn -Duser.home=/workspace clean compile quarkus:dev
+
+
+networks:
+  default:
+    name: mangoose-net
+
+volumes:
+  mongodbdata:
+    driver: local
