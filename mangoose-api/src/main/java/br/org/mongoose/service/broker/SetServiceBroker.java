@@ -18,6 +18,10 @@ public class SetServiceBroker {
 	@Inject
 	@RestClient
 	ScryfallSetsClient scryfallSetsClient;
+
+	public Integer countSets() {
+		return retrieveAllSets().size();
+	}
 	
 	public List<CardSet> retrieveAllSets() {
 		List<CardSet> sets = CardSet.listAll();

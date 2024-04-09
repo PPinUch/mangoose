@@ -1,0 +1,11 @@
+<div class="input-group">
+    <div class="input-group-append">
+        <button class="btn btn-outline-secondary" (click)="toggleLockComponent()" [disabled]="!is_locked && search_text === ''">
+            <i class="fas" [class.fa-lock]="is_locked" [class.fa-unlock]="!is_locked"></i>
+        </button>
+    </div>
+    @if (is_locked) {
+        <input id="prefix_text" type="text" [(ngModel)]="locked_prefix" disabled/>
+    }
+    <input id="main_text" type="text" class="form-control" [(ngModel)]="search_text" />
+  </div>

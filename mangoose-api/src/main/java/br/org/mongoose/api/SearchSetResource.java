@@ -22,6 +22,12 @@ public class SearchSetResource {
 	}
 
 	@GET
+	@Path("/count")
+	public Integer countSets() {
+		return service.countSets();
+	}
+
+	@GET
 	@Path("/{code}")
 	public CardSet getByCode(@PathParam("code") String code) {
 		return service.findSet(code);
