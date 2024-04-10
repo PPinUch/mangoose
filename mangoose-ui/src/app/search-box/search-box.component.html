@@ -8,4 +8,7 @@
         <input id="prefix_text" type="text" [(ngModel)]="locked_prefix" disabled/>
     }
     <input id="main_text" type="text" class="form-control" [(ngModel)]="search_text" />
+    <button class="btn btn-outline-secondary" (click)="searchCard()" [disabled]="this.search_text.length < 3">
+        <i class="fas fa-search"></i>
+    </button>
   </div>

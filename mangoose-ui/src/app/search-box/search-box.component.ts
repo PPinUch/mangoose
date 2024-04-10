@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SetSearchService } from '../services/set-search.service';
 import { CardSearchService } from '../services/card-search.service';
-import { CardSet } from '../models/base-model';
+import { Card, CardSet } from '../models/base-model';
 import { Observable, defer, expand, map, mergeMap, of, take } from 'rxjs';
 
 @Component({
@@ -21,6 +21,8 @@ export class SearchBoxComponent {
   locked_set?:CardSet;
   is_locked = false;
 
+  card:Card = new Card();
+
   private min_set_size = 3;
   private max_set_size = 5;
 
@@ -35,27 +37,48 @@ export class SearchBoxComponent {
     }
 
     this.is_locked = !this.is_locked;
-    // TODO: implement splicing the prefix of the search_text and putting it in locked_prefix. Need to implement service first
+
+    // If the state is locked, it'll search a set and lock it
     if(this.is_locked) {
-      
+      this.searchSetForLock().subscribe(res => {
+        if(!res) {
+          return;
+        }
+          this.locked_prefix = res.code || '-';
+          this.search_text = this.search_text.substring(res.code?.length || 0);
+      });
+      return;
     }
+
+    // Reset values to default input otherwise
+    this.search_text = this.locked_prefix + this.search_text;
+    this.locked_prefix = '';
   }
 
-  private searchSetForLock(set$: Observable<CardSet>, max_iterations: number = this.max_set_size): Observable<CardSet> {
+  /**
+   * Recursive method that will take input prefix and try to match it with the service's result
+   * @param set$ Observable that handles the set responses - starts with the first search
+   * @param word_len Dynamic length that increases to a five MAX.
+   * @returns Emmited observable with result or nothing if nothing matches
+   */
+  private searchSetForLock(
+      set$: Observable<CardSet> = this.set_search.fetchSet(this.search_text.substring(0, this.min_set_size)), 
+      word_len: number = this.min_set_size
+  ): Observable<CardSet> {
     return defer(() => {
-      let word_len = this.min_set_size;
-      let service_set$ = this.set_search.fetchSet(this.search_text.substring(0, word_len));
+      // let word_len = this.min_set_size;
+      // let service_set$ = this.set_search.fetchSet(this.search_text.substring(0, word_len));
 
-      return service_set$.pipe(
+      return set$.pipe(
         expand((set_result) => {
-          if(set_result || word_len >= max_iterations) {
+          if(set_result || word_len > this.max_set_size) {
             return of(set_result);
           }
           word_len++;
 
-          return this.searchSetForLock(service_set$, max_iterations);
+          return this.searchSetForLock(this.set_search.fetchSet(this.search_text.substring(0, word_len)), word_len);
         }),
-        take(max_iterations+1),
+        take(word_len),
         map((result) => {
           if(!result) {
             console.error('NO SET FOUND!');
@@ -63,6 +86,21 @@ export class SearchBoxComponent {
           return result;
         })
       );
+    });
+  }
+
+  searchCard():void {
+    if(!this.search_text) {
+      return;
+    }
+
+    let card_search_result$ = this.is_locked ? 
+      this.card_search.fetchCard(this.locked_prefix, this.search_text) : 
+      this.card_search.fetchCardByCode(this.search_text);
+
+    card_search_result$.subscribe((result) => {
+      this.card = result;
+      console.log(result);
     });
   }
 }

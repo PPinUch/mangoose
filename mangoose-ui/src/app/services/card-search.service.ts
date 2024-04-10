@@ -16,11 +16,11 @@ export class CardSearchService {
 
   constructor(private http: HttpClient) { }
 
-  fetchCard(set:string, col_num:number):Observable<Card> {
-    const card_code = set+col_num;
+  fetchCard(set:string, coll_code:string):Observable<Card> {
+    const card_code = set+coll_code;
     const card = this.cards_proxy.get(card_code);
     if(!card) {
-      const url = `${this.base_card_url}/${set}/${col_num}`;
+      const url = `${this.base_card_url}/${set}/${coll_code}`;
       return this.http.get<Card>(url).pipe(
         map((resp) => {
           if(resp) {

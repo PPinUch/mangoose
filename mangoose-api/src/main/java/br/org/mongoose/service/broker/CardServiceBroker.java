@@ -26,7 +26,7 @@ public class CardServiceBroker {
 	}
 
 	private Card fetchFromExternal(String set, String number) {
-		ScryfallCard external = scryfallCardsClient.getCardBySetAndNumber(set, Integer.parseInt(number));
+		ScryfallCard external = scryfallCardsClient.getCardBySetAndNumber(set, number);
 		if(external == null) {
 			throw new RuntimeException("No card found with "+set+"/"+number);
 		}

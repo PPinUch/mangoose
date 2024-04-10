@@ -23,7 +23,7 @@ public class SearchCardResource {
 
 	@GET
 	@Path("/{set}/{number}")
-	public Card getCardSetAndNumber(@PathParam("set") String set, @PathParam("number") Integer number) {
-		return cardService.findBySetAndNumber(set, number.toString());
+	public Card getCardSetAndNumber(@PathParam("set") String set, @PathParam("number") String number) {
+		return cardService.findBySetAndNumber(set, number);
 	}
 }

@@ -14,6 +14,6 @@ public interface ScryfallCardsApi {
 	@Path("/{set}/{number}")
 	@Produces(MediaType.APPLICATION_JSON)
 	ScryfallCard getCardBySetAndNumber(
-		@PathParam("set") String set, @PathParam("number") Integer number);
+		@PathParam("set") String set, @PathParam("number") String number);
 
 }
