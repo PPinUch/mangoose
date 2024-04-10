@@ -1,6 +1,6 @@
 <div class="input-group">
     <div class="input-group-append">
-        <button class="btn btn-outline-secondary" (click)="toggleLockComponent()" [disabled]="!is_locked && search_text === ''">
+        <button class="btn btn-outline-secondary" (click)="toggleLockComponent()" [disabled]="!is_locked && this.search_text.length < 3">
             <i class="fas" [class.fa-lock]="is_locked" [class.fa-unlock]="!is_locked"></i>
         </button>
     </div>

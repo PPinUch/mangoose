@@ -2,27 +2,27 @@ import { Injectable } from '@angular/core';
 import { ENV } from '../environment';
 import { CardSet } from '../models/base-model';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map, mergeMap, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SetSearchService {
 
-  private baseURL = `${ENV.SERVICE_ROOT}/set-search`;
+  private base_url = `${ENV.SERVICE_ROOT}/set-search`;
 
-  sets:Map<string, CardSet> = new Map();
+  private sets_proxy:Map<string, CardSet> = new Map();
 
   constructor(private http: HttpClient) { }
 
   public fetchSet(code:string):Observable<CardSet> {
-    const set = this.sets.get(code);
+    const set = this.sets_proxy.get(code);
     if(!set) {
-      const url = `${this.baseURL}/${code}`
+      const url = `${this.base_url}/${code}`
       return this.http.get<CardSet>(url)
       .pipe(
         map((response) => {
-          this.sets.set(response.code || '', response);
+          this.sets_proxy.set(response.code || '', response);
           return response;
         })
       );
@@ -30,24 +30,24 @@ export class SetSearchService {
     return of(set);
   }
 
-  public all():Observable<any> {
-    const count$ = this.http.get<number>(`${this.baseURL}/count`);
-    const fetchAll$ = this.http.get<CardSet[]>(`${this.baseURL}`);
+  public all():Observable<Map<string, CardSet>> {
+    const count$ = this.http.get<number>(`${this.base_url}/count`);
+    const fetchAll$ = this.http.get<CardSet[]>(`${this.base_url}`);
     
     const sets$ = count$.pipe(
-      map( (cntRes):Observable<Map<string, CardSet>> => {
-        if(cntRes > this.sets.size){
+      mergeMap( (cntRes) => {
+        if(cntRes > this.sets_proxy.size){
           return fetchAll$.pipe(
             map((setData):Map<string, CardSet> => {
               for(let sd of setData) {
-                this.sets.set(sd.code || '', sd);
+                this.sets_proxy.set(sd.code || '', sd);
               }
-              return this.sets;
+              return this.sets_proxy;
             })
           );
         }
         else {
-          return of(this.sets);
+          return of(this.sets_proxy);
         }
       })
     );
