@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FinderComponent } from './finder.component';
+import { EasyCardListingComponent } from './easy-card-listing.component';
 
-describe('FinderComponent', () => {
-  let component: FinderComponent;
-  let fixture: ComponentFixture<FinderComponent>;
+describe('EasyCardListingComponent', () => {
+  let component: EasyCardListingComponent;
+  let fixture: ComponentFixture<EasyCardListingComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FinderComponent]
+      imports: [EasyCardListingComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(FinderComponent);
+    fixture = TestBed.createComponent(EasyCardListingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

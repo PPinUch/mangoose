@@ -4,12 +4,14 @@ import { SetSearchService } from '../services/set-search.service';
 import { CardSearchService } from '../services/card-search.service';
 import { Card, CardSet } from '../models/base-model';
 import { Observable, defer, expand, map, mergeMap, of, take } from 'rxjs';
+import { ButtonsModule } from 'ngx-bootstrap/buttons'
 
 @Component({
   selector: 'app-search-box',
   standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    ButtonsModule
   ],
   templateUrl: './search-box.component.html',
   styleUrl: './search-box.component.scss'
