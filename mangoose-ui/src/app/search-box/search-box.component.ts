@@ -1,17 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SetSearchService } from '../services/set-search.service';
 import { CardSearchService } from '../services/card-search.service';
 import { Card, CardSet } from '../models/base-model';
 import { Observable, defer, expand, map, mergeMap, of, take } from 'rxjs';
 import { ButtonsModule } from 'ngx-bootstrap/buttons'
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { CommonModule } from '@angular/common';
+import { AlertModule } from 'ngx-bootstrap/alert';
 
 @Component({
   selector: 'app-search-box',
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
-    ButtonsModule
+    ButtonsModule,
+    TooltipModule,
+    AlertModule,
   ],
   templateUrl: './search-box.component.html',
   styleUrl: './search-box.component.scss'
@@ -23,7 +29,7 @@ export class SearchBoxComponent {
   locked_set?:CardSet;
   is_locked = false;
 
-  card:Card = new Card();
+  @Output() cardResult = new EventEmitter<Card>();
 
   private min_set_size = 3;
   private max_set_size = 5;
@@ -65,20 +71,20 @@ export class SearchBoxComponent {
    */
   private searchSetForLock(
       set$: Observable<CardSet> = this.set_search.fetchSet(this.search_text.substring(0, this.min_set_size)), 
-      word_len: number = this.min_set_size
+      word_len: number = 1
   ): Observable<CardSet> {
     return defer(() => {
       // let word_len = this.min_set_size;
       // let service_set$ = this.set_search.fetchSet(this.search_text.substring(0, word_len));
-
+      
       return set$.pipe(
         expand((set_result) => {
-          if(set_result || word_len > this.max_set_size) {
+          if(set_result || word_len > this.max_set_size - this.min_set_size) {
             return of(set_result);
           }
           word_len++;
 
-          return this.searchSetForLock(this.set_search.fetchSet(this.search_text.substring(0, word_len)), word_len);
+          return this.searchSetForLock(this.set_search.fetchSet(this.search_text.substring(0, this.min_set_size + word_len)), word_len);
         }),
         take(word_len),
         map((result) => {
@@ -101,8 +107,17 @@ export class SearchBoxComponent {
       this.card_search.fetchCardByCode(this.search_text);
 
     card_search_result$.subscribe((result) => {
-      this.card = result;
       console.log(result);
+      this.cardResult.emit(result);
     });
+
+    this.search_text = '';
+  }
+
+  triggerSearch(event:any):void {
+    console.log('CALLED???');
+    if (event.key === 'Enter') {
+      this.searchCard();
+    }
   }
 }
