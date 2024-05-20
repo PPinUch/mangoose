@@ -1,1 +1,12 @@
-<p>table-results works!</p>
+<div>
+    <p-table [value]="result">
+        <ng-template pTemplate="header"></ng-template>
+        <ng-template pTemplate="body" let-card>
+            <tr>{{card.set.code}}</tr>
+            <tr>{{card.card.code}}</tr>
+            <tr>{{card.card.name}}</tr>
+            <tr>{{card.card.name}}</tr>
+        </ng-template>
+    </p-table>
+    {{'CALLDE: '+cnt}}
+</div>
